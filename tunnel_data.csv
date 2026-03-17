@@ -1,0 +1,7 @@
+vibration,pressure,gas,water,displacement
+1.5,120,0.8,1,0      # SAFE
+2.5,160,1.2,2,1      # SAFE
+3.5,200,1.8,3,2      # WARNING
+4.0,220,2.2,4,2      # WARNING
+5.0,260,2.8,5,3      # HIGH COLLAPSE RISK
+5.5,300,3.2,6,4      # HIGH COLLAPSE RISK
