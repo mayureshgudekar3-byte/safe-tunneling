@@ -7,14 +7,17 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: url("https://images.unsplash.com/photo-1581091012184-5c4c9b0b1f5c") no-repeat center center fixed;
+  background-image: url("https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=1600&q=80");
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   color: white;
   text-align: center;
   margin: 0;
 }
 
-/* Dark overlay for readability */
+/* Dark overlay so text stays readable */
 body::before {
   content: "";
   position: fixed;
@@ -154,17 +157,15 @@ let className = '';
 
 if (risk < 40) {
 status = 'SAFE';
-className='safe';
+className = 'safe';
 }
-
 else if (risk < 70) {
 status = 'WARNING';
-className='warning';
+className = 'warning';
 }
-
 else {
 status = 'HIGH COLLAPSE RISK';
-className='danger';
+className = 'danger';
 }
 
 const row = table.insertRow();
