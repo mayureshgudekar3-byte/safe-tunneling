@@ -7,7 +7,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-image: url("https://images.unsplash.com/photo-1590496793929-36417d3117de?auto=format&fit=crop&w=1600&q=80");
+  background-image: url("https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1600&q=80");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -17,7 +17,7 @@ body {
   margin: 0;
 }
 
-/* Dark overlay so text stays readable */
+/* lighter overlay so tunnel is visible */
 body::before {
   content: "";
   position: fixed;
@@ -25,11 +25,13 @@ body::before {
   left:0;
   width:100%;
   height:100%;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.45);
   z-index:-1;
 }
 
-h1 { color: #38bdf8; }
+h1 {
+  color: #38bdf8;
+}
 
 .container {
   width: 80%;
@@ -38,7 +40,6 @@ h1 { color: #38bdf8; }
   background: rgba(30,41,59,0.85);
   padding: 30px;
   border-radius: 10px;
-  backdrop-filter: blur(5px);
 }
 
 input, button {
@@ -123,7 +124,6 @@ reader.onload = function(e) {
 
 const text = e.target.result;
 const rows = text.split('\n');
-
 const table = document.getElementById('resultsTable');
 
 table.innerHTML = `
@@ -157,15 +157,15 @@ let className = '';
 
 if (risk < 40) {
 status = 'SAFE';
-className = 'safe';
+className='safe';
 }
 else if (risk < 70) {
 status = 'WARNING';
-className = 'warning';
+className='warning';
 }
 else {
 status = 'HIGH COLLAPSE RISK';
-className = 'danger';
+className='danger';
 }
 
 const row = table.insertRow();
