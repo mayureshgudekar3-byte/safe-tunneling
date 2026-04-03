@@ -4,40 +4,19 @@
 <title>AI Tunnel Safety System</title>
 
 <style>
-
 body {
-  font-family: Arial, sans-serif;
-  background-image: url("https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1600&q=80");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  font-family: Arial;
+  background: #0f172a;
   color: white;
   text-align: center;
-  margin: 0;
 }
 
-/* lighter overlay so tunnel is visible */
-body::before {
-  content: "";
-  position: fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background: rgba(0,0,0,0.45);
-  z-index:-1;
-}
-
-h1 {
-  color: #38bdf8;
-}
+h1 { color: #38bdf8; }
 
 .container {
-  width: 80%;
+  width: 85%;
   margin: auto;
-  margin-top: 40px;
-  background: rgba(30,41,59,0.85);
+  background: #1e293b;
   padding: 30px;
   border-radius: 10px;
 }
@@ -45,15 +24,14 @@ h1 {
 input, button {
   padding: 10px;
   margin: 10px 0;
-  border-radius: 5px;
-  border: none;
 }
 
 button {
   background: #38bdf8;
+  border: none;
   color: black;
-  font-weight: bold;
   cursor: pointer;
+  font-weight: bold;
 }
 
 button:hover {
@@ -65,18 +43,28 @@ table {
   margin-top: 20px;
   border-collapse: collapse;
   width: 100%;
-  background: rgba(0,0,0,0.5);
 }
 
 td, th {
-  padding: 8px;
+  padding: 10px;
   border: 1px solid gray;
 }
 
 .safe { color: lightgreen; }
 .warning { color: orange; }
 .danger { color: red; }
-.result { font-weight: bold; }
+
+.result {
+  font-weight: bold;
+}
+
+.dashboard {
+  text-align: left;
+  margin-top: 20px;
+  background: #0f172a;
+  padding: 15px;
+  border-radius: 10px;
+}
 
 </style>
 </head>
@@ -84,110 +72,134 @@ td, th {
 <body>
 
 <h1>AI Driven Smart Tunneling and Underground Safety System</h1>
-<h2>Upload Sensor Data File (CSV) to Predict Collapse Risk</h2>
+<p style="color:lightgray;">
+Real-time AI-based tunnel monitoring using IoT sensor data
+</p>
 
 <div class="container">
 
-<input type="file" id="fileInput" accept=".csv"><br>
+  <p>📍 Sensor Placement: Data collected every <b>50 meters</b> inside tunnel</p>
 
-<button onclick="processFile()">Predict Collapse Risk</button>
+  <input type="file" id="fileInput" accept=".csv"><br>
+  <button onclick="processFile()">Predict Collapse Risk</button>
 
-<table id="resultsTable">
-<tr>
-<th>Vibration</th>
-<th>Pressure</th>
-<th>Gas</th>
-<th>Water</th>
-<th>Displacement</th>
-<th>Risk Score</th>
-<th>Status</th>
-</tr>
-</table>
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <h3>📊 Risk Levels</h3>
+    <ul>
+      <li><span class="safe">SAFE:</span> Risk Score &lt; 40</li>
+      <li><span class="warning">WARNING:</span> 40 – 70</li>
+      <li><span class="danger">HIGH RISK:</span> &gt; 70</li>
+    </ul>
+
+    <h3>📏 Parameter Safe Ranges</h3>
+    <ul>
+      <li>Vibration: 0 – 2 mm/s</li>
+      <li>Pressure: 80 – 150 kPa</li>
+      <li>Gas: 0 – 1 ppm</li>
+      <li>Water Level: 0 – 2 m</li>
+      <li>Displacement: 0 – 2 mm</li>
+    </ul>
+  </div>
+
+  <!-- Table -->
+  <table id="resultsTable">
+    <tr>
+      <th>Distance (m)</th>
+      <th>Vibration (mm/s)</th>
+      <th>Pressure (kPa)</th>
+      <th>Gas (ppm)</th>
+      <th>Water Level (m)</th>
+      <th>Displacement (mm)</th>
+      <th>Risk Score</th>
+      <th>Status</th>
+    </tr>
+  </table>
 
 </div>
 
 <script>
-
 function processFile() {
 
-const fileInput = document.getElementById('fileInput');
+  const fileInput = document.getElementById('fileInput');
 
-if (!fileInput.files.length) {
-alert('Please select a CSV file first');
-return;
+  if (!fileInput.files.length) {
+    alert('Please select a CSV file first');
+    return;
+  }
+
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+
+    const text = e.target.result;
+    const rows = text.split('\n');
+
+    const table = document.getElementById('resultsTable');
+
+    // Reset table
+    table.innerHTML = `
+      <tr>
+        <th>Distance (m)</th>
+        <th>Vibration (mm/s)</th>
+        <th>Pressure (kPa)</th>
+        <th>Gas (ppm)</th>
+        <th>Water Level (m)</th>
+        <th>Displacement (mm)</th>
+        <th>Risk Score</th>
+        <th>Status</th>
+      </tr>
+    `;
+
+    for (let i = 1; i < rows.length; i++) {
+
+      if (!rows[i].trim()) continue;
+
+      const data = rows[i].split(',');
+
+      const distance = Number(data[0]);
+      const vibration = Number(data[1]);
+      const pressure = Number(data[2]);
+      const gas = Number(data[3]);
+      const water = Number(data[4]);
+      const displacement = Number(data[5]);
+
+      // Risk Formula
+      const risk = (vibration * 5) + (pressure / 20) + (gas * 10) + (water * 2) + (displacement * 8);
+
+      let status = '';
+      let className = '';
+
+      if (risk < 40) {
+        status = 'SAFE';
+        className = 'safe';
+      } else if (risk < 70) {
+        status = 'WARNING';
+        className = 'warning';
+      } else {
+        status = 'HIGH COLLAPSE RISK';
+        className = 'danger';
+      }
+
+      const row = table.insertRow();
+
+      row.innerHTML = `
+        <td>${distance}</td>
+        <td>${vibration}</td>
+        <td>${pressure}</td>
+        <td>${gas}</td>
+        <td>${water}</td>
+        <td>${displacement}</td>
+        <td>${risk.toFixed(2)}</td>
+        <td class="${className} result">${status}</td>
+      `;
+    }
+
+  };
+
+  reader.readAsText(file);
 }
-
-const file = fileInput.files[0];
-const reader = new FileReader();
-
-reader.onload = function(e) {
-
-const text = e.target.result;
-const rows = text.split('\n');
-const table = document.getElementById('resultsTable');
-
-table.innerHTML = `
-<tr>
-<th>Vibration</th>
-<th>Pressure</th>
-<th>Gas</th>
-<th>Water</th>
-<th>Displacement</th>
-<th>Risk Score</th>
-<th>Status</th>
-</tr>
-`;
-
-for (let i = 1; i < rows.length; i++) {
-
-if (!rows[i].trim()) continue;
-
-const data = rows[i].split(',');
-
-const vibration = Number(data[0]);
-const pressure = Number(data[1]);
-const gas = Number(data[2]);
-const water = Number(data[3]);
-const displacement = Number(data[4]);
-
-const risk = (vibration*5) + (pressure/20) + (gas*10) + (water*2) + (displacement*8);
-
-let status = '';
-let className = '';
-
-if (risk < 40) {
-status = 'SAFE';
-className='safe';
-}
-else if (risk < 70) {
-status = 'WARNING';
-className='warning';
-}
-else {
-status = 'HIGH COLLAPSE RISK';
-className='danger';
-}
-
-const row = table.insertRow();
-
-row.innerHTML = `
-<td>${vibration}</td>
-<td>${pressure}</td>
-<td>${gas}</td>
-<td>${water}</td>
-<td>${displacement}</td>
-<td>${risk.toFixed(2)}</td>
-<td class="${className} result">${status}</td>
-`;
-
-}
-
-};
-
-reader.readAsText(file);
-
-}
-
 </script>
 
 </body>
