@@ -2,79 +2,120 @@
 <html>
 <head>
 <title>AI Tunnel Safety System</title>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-  font-family: Arial;
   margin: 0;
+  font-family: 'Segoe UI', sans-serif;
   color: white;
   text-align: center;
 
-  background: url('https://images.unsplash.com/photo-1581090700227-1e37b190418e') no-repeat center center/cover;
+  background: linear-gradient(270deg,#020617,#0f172a,#020617);
+  background-size: 600% 600%;
+  animation: bgMove 12s ease infinite;
 }
 
-.overlay {
-  background: rgba(0,0,0,0.7);
-  min-height: 100vh;
-  padding: 30px;
+@keyframes bgMove {
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
 }
 
 h1 {
   color: #38bdf8;
+  text-shadow: 0 0 15px #38bdf8;
 }
 
-.container {
+/* Dashboard Panel */
+.dashboard {
   width: 80%;
   margin: auto;
-  background: rgba(30,41,59,0.9);
-  padding: 20px;
-  border-radius: 10px;
+  margin-top: 20px;
+  padding: 15px;
+
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(56,189,248,0.3);
 }
 
-/* TABLE */
-table {
+/* Main container */
+.container {
+  width: 85%;
   margin: auto;
   margin-top: 20px;
-  border-collapse: collapse;
+  padding: 20px;
+
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(56,189,248,0.3);
+}
+
+/* Button */
+button {
+  padding: 12px 20px;
+  background: #38bdf8;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #38bdf8;
+}
+
+/* Table */
+table {
   width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
 }
 
 td, th {
   padding: 10px;
-  border: 1px solid gray;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
-.safe { color: lightgreen; font-weight: bold; }
+th {
+  background: rgba(56,189,248,0.2);
+}
+
+tr:hover {
+  background: rgba(56,189,248,0.1);
+}
+
+/* Status */
+.safe { color: #22c55e; font-weight: bold; }
 .warning { color: orange; font-weight: bold; }
 .danger { color: red; font-weight: bold; }
-
-button {
-  padding: 10px;
-  margin-top: 10px;
-  background: #38bdf8;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
 </style>
 </head>
 
 <body>
 
-<div class="overlay">
-
 <h1>AI Driven Smart Tunneling and Underground Safety System</h1>
-<p>Upload Sensor Data File (CSV) to Predict Collapse Risk</p>
+
+<!-- Dashboard -->
+<div class="dashboard">
+<h3>📊 Risk Levels</h3>
+<p>SAFE: Risk &lt; 40 | WARNING: 40–70 | HIGH RISK: &gt; 70</p>
+<p>📍 Sensor Coverage: 0m → 500m Tunnel Length</p>
+</div>
 
 <div class="container">
 
-<input type="file" id="fileInput"><br>
+<input type="file" id="fileInput">
+<br>
 <button onclick="processFile()">Predict Collapse Risk</button>
 
 <table id="resultsTable">
 <tr>
+<th>Distance (m)</th>
 <th>Vibration (mm/s)</th>
 <th>Pressure (kPa)</th>
 <th>Gas (ppm)</th>
@@ -85,30 +126,28 @@ button {
 </tr>
 </table>
 
-<canvas id="riskChart" style="margin-top:30px;"></canvas>
-
-</div>
+<canvas id="chart" style="margin-top:30px;"></canvas>
 
 </div>
 
 <script>
 let chart;
 
-function processFile() {
+function processFile(){
 
-const file = document.getElementById('fileInput').files[0];
-if (!file) return alert("Upload CSV");
+const file = document.getElementById("fileInput").files[0];
+if(!file) return alert("Upload CSV");
 
 const reader = new FileReader();
 
-reader.onload = function(e) {
+reader.onload = function(e){
 
 const rows = e.target.result.split('\n');
-
-const table = document.getElementById('resultsTable');
+const table = document.getElementById("resultsTable");
 
 table.innerHTML = `
 <tr>
+<th>Distance (m)</th>
 <th>Vibration (mm/s)</th>
 <th>Pressure (kPa)</th>
 <th>Gas (ppm)</th>
@@ -119,32 +158,34 @@ table.innerHTML = `
 </tr>
 `;
 
+let distances = [];
 let risks = [];
-let labels = [];
 
-for (let i = 1; i < rows.length; i++) {
+for(let i=1;i<rows.length;i++){
 
-if (!rows[i].trim()) continue;
+if(!rows[i].trim()) continue;
 
-const d = rows[i].split(',');
+let d = rows[i].split(',');
 
-let vibration = Number(d[0]);
-let pressure = Number(d[1]);
-let gas = Number(d[2]);
-let water = Number(d[3]);
-let displacement = Number(d[4]);
+let distance = Number(d[0]);
+let vibration = Number(d[1]);
+let pressure = Number(d[2]);
+let gas = Number(d[3]);
+let water = Number(d[4]);
+let displacement = Number(d[5]);
 
 let risk = (vibration*5)+(pressure/20)+(gas*10)+(water*2)+(displacement*8);
 
-let status="", cls="";
+let status="",cls="";
 
-if (risk < 40) { status="SAFE"; cls="safe"; }
-else if (risk < 70) { status="WARNING"; cls="warning"; }
-else { status="HIGH RISK"; cls="danger"; }
+if(risk<40){status="SAFE";cls="safe";}
+else if(risk<70){status="WARNING";cls="warning";}
+else{status="HIGH RISK";cls="danger";}
 
 let row = table.insertRow();
 
 row.innerHTML = `
+<td>${distance}</td>
 <td>${vibration}</td>
 <td>${pressure}</td>
 <td>${gas}</td>
@@ -154,21 +195,22 @@ row.innerHTML = `
 <td class="${cls}">${status}</td>
 `;
 
+distances.push(distance);
 risks.push(risk);
-labels.push("Data " + i);
 }
 
-// GRAPH
-if (chart) chart.destroy();
+// Graph
+if(chart) chart.destroy();
 
-chart = new Chart(document.getElementById('riskChart'), {
-type: 'line',
+chart = new Chart(document.getElementById("chart"), {
+type: "line",
 data: {
-labels: labels,
+labels: distances,
 datasets: [{
-label: 'Risk Score',
+label: "Risk vs Distance",
 data: risks,
-borderWidth: 2
+borderWidth: 2,
+fill: false
 }]
 }
 });
