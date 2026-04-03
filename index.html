@@ -1,205 +1,303 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>AI Tunnel Safety System</title>
+<title>AI Tunnel Control System</title>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Particles -->
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
 
 <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Orbitron', sans-serif;
+}
+
 body {
-  font-family: Arial;
-  background: #0f172a;
+  background: radial-gradient(circle at top, #020617, #000);
   color: white;
-  text-align: center;
+  overflow-x: hidden;
 }
 
-h1 { color: #38bdf8; }
-
-.container {
-  width: 85%;
-  margin: auto;
-  background: #1e293b;
-  padding: 30px;
-  border-radius: 10px;
+/* PARTICLES */
+#particles {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
 }
 
-input, button {
-  padding: 10px;
-  margin: 10px 0;
+/* HERO */
+.hero {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10%;
 }
 
+.hero h1 {
+  font-size: 70px;
+  color: #38bdf8;
+  text-shadow: 0 0 20px #38bdf8;
+}
+
+.hero p {
+  margin-top: 20px;
+  color: #94a3b8;
+}
+
+/* CARD */
+.card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(20px);
+  margin: 40px 10%;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: 0.4s;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 0 20px #38bdf8;
+}
+
+/* BUTTON */
 button {
-  background: #38bdf8;
-  border: none;
-  color: black;
+  padding: 12px 25px;
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid #38bdf8;
+  color: #38bdf8;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: bold;
 }
 
 button:hover {
-  background: #0ea5e9;
+  background: #38bdf8;
+  color: black;
+  box-shadow: 0 0 15px #38bdf8;
 }
 
+/* TABLE */
 table {
-  margin: auto;
-  margin-top: 20px;
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
 }
 
 td, th {
   padding: 10px;
-  border: 1px solid gray;
+  border-bottom: 1px solid #1e293b;
 }
 
-.safe { color: lightgreen; }
-.warning { color: orange; }
-.danger { color: red; }
+/* COLORS */
+.safe { color: #4ade80; text-shadow: 0 0 5px #4ade80; }
+.warning { color: #facc15; text-shadow: 0 0 5px #facc15; }
+.danger { color: #f87171; text-shadow: 0 0 5px #f87171; }
 
-.result {
-  font-weight: bold;
+/* ALERT */
+.alert {
+  display: none;
+  background: red;
+  padding: 10px;
+  text-align: center;
+  animation: blink 1s infinite;
 }
 
-.dashboard {
-  text-align: left;
-  margin-top: 20px;
-  background: #0f172a;
-  padding: 15px;
-  border-radius: 10px;
+@keyframes blink {
+  50% { opacity: 0.3; }
 }
 
+/* SCROLL */
+.fade {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: 1s;
+}
+
+.fade.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 </style>
 </head>
 
 <body>
 
-<h1>AI Driven Smart Tunneling and Underground Safety System</h1>
-<p style="color:lightgray;">
-Real-time AI-based tunnel monitoring using IoT sensor data
-</p>
+<div id="particles"></div>
 
-<div class="container">
+<!-- HERO -->
+<section class="hero">
+  <h1>AI Tunnel Control</h1>
+  <p>Autonomous underground risk intelligence system</p>
+  <p>📍 Monitoring up to 500 meters (50m interval)</p>
+</section>
 
-  <p>📍 Sensor Placement: Data collected every <b>50 meters</b> inside tunnel</p>
+<!-- ALERT -->
+<div class="alert" id="alertBox">🚨 HIGH COLLAPSE RISK DETECTED!</div>
 
-  <input type="file" id="fileInput" accept=".csv"><br>
-  <button onclick="processFile()">Predict Collapse Risk</button>
+<!-- UPLOAD -->
+<div class="card fade">
+  <h2>Upload Sensor Data</h2>
+  <input type="file" id="fileInput"><br>
+  <button onclick="processFile()">Run AI Analysis</button>
+  <button onclick="generateData()">Generate 500m Simulation</button>
+</div>
 
-  <!-- Dashboard -->
-  <div class="dashboard">
-    <h3>📊 Risk Levels</h3>
-    <ul>
-      <li><span class="safe">SAFE:</span> Risk Score &lt; 40</li>
-      <li><span class="warning">WARNING:</span> 40 – 70</li>
-      <li><span class="danger">HIGH RISK:</span> &gt; 70</li>
-    </ul>
+<!-- DASHBOARD -->
+<div class="card fade">
+  <h2>Risk Levels</h2>
+  <p class="safe">SAFE: Risk < 40</p>
+  <p class="warning">WARNING: 40–70</p>
+  <p class="danger">HIGH RISK: > 70</p>
+</div>
 
-    <h3>📏 Parameter Safe Ranges</h3>
-    <ul>
-      <li>Vibration: 0 – 2 mm/s</li>
-      <li>Pressure: 80 – 150 kPa</li>
-      <li>Gas: 0 – 1 ppm</li>
-      <li>Water Level: 0 – 2 m</li>
-      <li>Displacement: 0 – 2 mm</li>
-    </ul>
-  </div>
+<!-- GRAPH -->
+<div class="card fade">
+  <h2>AI Risk Graph</h2>
+  <canvas id="riskChart"></canvas>
+</div>
 
-  <!-- Table -->
-  <table id="resultsTable">
-    <tr>
-      <th>Distance (m)</th>
-      <th>Vibration (mm/s)</th>
-      <th>Pressure (kPa)</th>
-      <th>Gas (ppm)</th>
-      <th>Water Level (m)</th>
-      <th>Displacement (mm)</th>
-      <th>Risk Score</th>
-      <th>Status</th>
-    </tr>
-  </table>
-
+<!-- TABLE -->
+<div class="card fade">
+  <h2>Sensor Data Output</h2>
+  <table id="resultsTable"></table>
 </div>
 
 <script>
+let chart;
+
+// CSV PROCESS
 function processFile() {
+const file = document.getElementById('fileInput').files[0];
+if (!file) return alert("Upload CSV");
 
-  const fileInput = document.getElementById('fileInput');
+const reader = new FileReader();
 
-  if (!fileInput.files.length) {
-    alert('Please select a CSV file first');
-    return;
-  }
+reader.onload = function(e) {
+processRows(e.target.result.split('\n'));
+};
 
-  const file = fileInput.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-
-    const text = e.target.result;
-    const rows = text.split('\n');
-
-    const table = document.getElementById('resultsTable');
-
-    // Reset table
-    table.innerHTML = `
-      <tr>
-        <th>Distance (m)</th>
-        <th>Vibration (mm/s)</th>
-        <th>Pressure (kPa)</th>
-        <th>Gas (ppm)</th>
-        <th>Water Level (m)</th>
-        <th>Displacement (mm)</th>
-        <th>Risk Score</th>
-        <th>Status</th>
-      </tr>
-    `;
-
-    for (let i = 1; i < rows.length; i++) {
-
-      if (!rows[i].trim()) continue;
-
-      const data = rows[i].split(',');
-
-      const distance = Number(data[0]);
-      const vibration = Number(data[1]);
-      const pressure = Number(data[2]);
-      const gas = Number(data[3]);
-      const water = Number(data[4]);
-      const displacement = Number(data[5]);
-
-      // Risk Formula
-      const risk = (vibration * 5) + (pressure / 20) + (gas * 10) + (water * 2) + (displacement * 8);
-
-      let status = '';
-      let className = '';
-
-      if (risk < 40) {
-        status = 'SAFE';
-        className = 'safe';
-      } else if (risk < 70) {
-        status = 'WARNING';
-        className = 'warning';
-      } else {
-        status = 'HIGH COLLAPSE RISK';
-        className = 'danger';
-      }
-
-      const row = table.insertRow();
-
-      row.innerHTML = `
-        <td>${distance}</td>
-        <td>${vibration}</td>
-        <td>${pressure}</td>
-        <td>${gas}</td>
-        <td>${water}</td>
-        <td>${displacement}</td>
-        <td>${risk.toFixed(2)}</td>
-        <td class="${className} result">${status}</td>
-      `;
-    }
-
-  };
-
-  reader.readAsText(file);
+reader.readAsText(file);
 }
+
+// COMMON FUNCTION
+function processRows(rows) {
+
+let table = document.getElementById('resultsTable');
+
+table.innerHTML = `
+<tr>
+<th>Distance (m)</th>
+<th>Vibration</th>
+<th>Pressure</th>
+<th>Gas</th>
+<th>Water</th>
+<th>Displacement</th>
+<th>Risk</th>
+<th>AI Confidence</th>
+<th>Status</th>
+</tr>`;
+
+let distances = [];
+let risks = [];
+let highRisk = false;
+
+for (let i = 1; i < rows.length; i++) {
+if (!rows[i].trim()) continue;
+
+let d = rows[i].split(',');
+
+let distance = Number(d[0]);
+let vibration = Number(d[1]);
+let pressure = Number(d[2]);
+let gas = Number(d[3]);
+let water = Number(d[4]);
+let displacement = Number(d[5]);
+
+let risk = (vibration*5)+(pressure/20)+(gas*10)+(water*2)+(displacement*8);
+
+let confidence = Math.min(100, risk).toFixed(1) + "%";
+
+let status="", cls="";
+
+if (risk < 40) { status="SAFE"; cls="safe"; }
+else if (risk < 70) { status="WARNING"; cls="warning"; }
+else { status="HIGH RISK"; cls="danger"; highRisk=true; }
+
+distances.push(distance);
+risks.push(risk);
+
+let row = table.insertRow();
+
+row.innerHTML = `
+<td>${distance}</td>
+<td>${vibration}</td>
+<td>${pressure}</td>
+<td>${gas}</td>
+<td>${water}</td>
+<td>${displacement}</td>
+<td>${risk.toFixed(2)}</td>
+<td>${confidence}</td>
+<td class="${cls}">${status}</td>`;
+}
+
+// ALERT
+document.getElementById("alertBox").style.display = highRisk ? "block" : "none";
+
+// GRAPH
+if (chart) chart.destroy();
+
+chart = new Chart(document.getElementById('riskChart'), {
+type: 'line',
+data: {
+labels: distances,
+datasets: [{
+label: 'Risk vs Distance',
+data: risks,
+borderWidth: 2
+}]
+}
+});
+}
+
+// AUTO GENERATE
+function generateData() {
+let rows = ["distance,vibration,pressure,gas,water,displacement"];
+
+for (let d = 50; d <= 500; d += 50) {
+rows.push(`${d},${(d/100+Math.random()).toFixed(2)},${100+d},${(d/200).toFixed(2)},${(d/150).toFixed(2)},${(d/120).toFixed(2)}`);
+}
+
+processRows(rows);
+}
+
+// SCROLL ANIMATION
+const elements = document.querySelectorAll('.fade');
+window.addEventListener('scroll', () => {
+elements.forEach(el => {
+const top = el.getBoundingClientRect().top;
+if (top < window.innerHeight - 100) el.classList.add('show');
+});
+});
+
+// PARTICLES
+tsParticles.load("particles", {
+particles: {
+number: { value: 60 },
+size: { value: 2 },
+move: { speed: 1 },
+links: { enable: true, color: "#38bdf8" }
+}
+});
 </script>
 
 </body>
