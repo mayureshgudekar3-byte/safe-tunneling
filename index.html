@@ -2,107 +2,85 @@
 <html>
 <head>
 <title>AI Tunnel Safety System</title>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
-/* ===== BODY BACKGROUND ===== */
+/* ===== BODY ===== */
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
   color: white;
   text-align: center;
   overflow-x: hidden;
 
-  background: linear-gradient(270deg,#020617,#0f172a,#020617);
-  background-size: 600% 600%;
-  animation: bgMove 12s ease infinite;
+  background: radial-gradient(circle at top, #0f172a, #020617);
 }
 
-@keyframes bgMove {
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-
-/* ===== FLOATING PARTICLES ===== */
+/* GRID BACKGROUND */
 body::before {
-  content:"";
+  content: "";
   position: fixed;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle,rgba(56,189,248,0.2) 1px, transparent 1px);
+  background-image: 
+    linear-gradient(rgba(56,189,248,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56,189,248,0.05) 1px, transparent 1px);
   background-size: 40px 40px;
-  animation: moveParticles 20s linear infinite;
-}
-
-@keyframes moveParticles {
-  from { transform: translateY(0); }
-  to { transform: translateY(-200px); }
 }
 
 /* ===== TITLE ===== */
 h1 {
-  color: #38bdf8;
-  font-size: 32px;
-  text-shadow: 0 0 20px #38bdf8;
-  animation: fadeDown 1s ease;
+  font-size: 40px;
+  background: linear-gradient(90deg,#38bdf8,#0ea5e9);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 25px rgba(56,189,248,0.5);
+  margin-top: 20px;
 }
 
-@keyframes fadeDown {
-  from {opacity:0; transform:translateY(-20px);}
-  to {opacity:1; transform:translateY(0);}
-}
-
-/* ===== DASHBOARD ===== */
-.dashboard {
+/* ===== CARDS ===== */
+.dashboard, .container {
   width: 85%;
-  margin: auto;
-  margin-top: 20px;
-  padding: 20px;
-
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(15px);
-  border-radius: 15px;
-
-  box-shadow: 0 0 25px rgba(56,189,248,0.4);
-  animation: fadeUp 1s ease;
-}
-
-@keyframes fadeUp {
-  from {opacity:0; transform:translateY(30px);}
-  to {opacity:1; transform:translateY(0);}
-}
-
-/* ===== MAIN CONTAINER ===== */
-.container {
-  width: 90%;
-  margin: auto;
-  margin-top: 20px;
+  margin: 20px auto;
   padding: 25px;
 
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(15px);
-  border-radius: 15px;
+  border-radius: 20px;
 
-  box-shadow: 0 0 25px rgba(56,189,248,0.4);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+
+  box-shadow: 
+    0 0 20px rgba(56,189,248,0.2),
+    inset 0 0 10px rgba(255,255,255,0.05);
+
+  transition: 0.4s;
+}
+
+.dashboard:hover, .container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 40px rgba(56,189,248,0.5);
 }
 
 /* ===== BUTTON ===== */
 button {
-  padding: 14px 24px;
-  background: linear-gradient(90deg,#38bdf8,#0ea5e9);
+  padding: 14px 28px;
+  border-radius: 12px;
   border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  margin-top: 10px;
+
+  background: linear-gradient(90deg,#38bdf8,#0ea5e9);
   color: white;
   font-weight: bold;
+  letter-spacing: 1px;
+
+  cursor: pointer;
   transition: 0.3s;
 }
 
 button:hover {
-  transform: scale(1.08);
+  transform: scale(1.1);
   box-shadow: 0 0 25px #38bdf8;
 }
 
@@ -111,44 +89,48 @@ table {
   width: 100%;
   margin-top: 20px;
   border-collapse: collapse;
-  animation: fadeUp 1s ease;
-}
-
-td, th {
-  padding: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 th {
-  background: rgba(56,189,248,0.25);
-  font-size: 15px;
+  background: linear-gradient(90deg,#0ea5e9,#38bdf8);
+  padding: 12px;
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+tr {
+  transition: 0.3s;
 }
 
 tr:hover {
   background: rgba(56,189,248,0.1);
-  transition: 0.3s;
+  transform: scale(1.01);
 }
 
-/* ===== STATUS ===== */
-.safe { color: #22c55e; font-weight: bold; }
-.warning { color: orange; font-weight: bold; }
-.danger { color: red; font-weight: bold; }
-
-/* ===== BIG RISK DISPLAY ===== */
-.risk-display {
-  margin-top: 20px;
-  font-size: 40px;
+/* ===== BIG RISK TEXT ===== */
+#bigRisk {
+  font-size: 55px;
   font-weight: bold;
-  letter-spacing: 2px;
-  text-shadow: 0 0 20px currentColor;
+  margin-top: 20px;
+  text-shadow: 0 0 30px currentColor;
   animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {transform: scale(1);}
+  50% {transform: scale(1.1);}
+  100% {transform: scale(1);}
 }
+
+/* ===== STATUS COLORS ===== */
+.safe { color: #22c55e; }
+.warning { color: orange; }
+.danger { color: red; }
 
 </style>
 </head>
@@ -157,22 +139,25 @@ tr:hover {
 
 <h1>AI Driven Smart Tunneling and Underground Safety System</h1>
 
-<!-- Dashboard -->
+<!-- DASHBOARD -->
 <div class="dashboard">
 <h3>📊 Risk Levels</h3>
 <p>SAFE: Risk &lt; 40 | WARNING: 40–70 | HIGH RISK: &gt; 70</p>
 <p>📍 Sensor Coverage: 0m → 500m Tunnel Length</p>
 </div>
 
+<!-- MAIN -->
 <div class="container">
 
 <input type="file" id="fileInput">
-<br>
+<br><br>
+
 <button onclick="processFile()">Predict Collapse Risk</button>
 
-<!-- BIG RISK TEXT -->
-<div id="bigRisk" class="risk-display"></div>
+<!-- BIG RISK -->
+<div id="bigRisk"></div>
 
+<!-- TABLE -->
 <table id="resultsTable">
 <tr>
 <th>Distance (m)</th>
@@ -186,6 +171,7 @@ tr:hover {
 </tr>
 </table>
 
+<!-- GRAPH -->
 <canvas id="chart" style="margin-top:30px;"></canvas>
 
 </div>
@@ -263,23 +249,23 @@ distances.push(distance);
 risks.push(risk);
 }
 
-// ===== BIG RISK DISPLAY =====
-let bigText = document.getElementById("bigRisk");
+/* ===== BIG RISK DISPLAY ===== */
+let big = document.getElementById("bigRisk");
 
 if(maxRisk < 40){
-  bigText.innerHTML = "SAFE ZONE";
-  bigText.style.color = "#22c55e";
+  big.innerHTML = "SAFE";
+  big.style.color = "#22c55e";
 }
 else if(maxRisk < 70){
-  bigText.innerHTML = "WARNING ZONE";
-  bigText.style.color = "orange";
+  big.innerHTML = "WARNING";
+  big.style.color = "orange";
 }
 else{
-  bigText.innerHTML = "HIGH COLLAPSE RISK";
-  bigText.style.color = "red";
+  big.innerHTML = "HIGH RISK";
+  big.style.color = "red";
 }
 
-// ===== GRAPH =====
+/* ===== GRAPH ===== */
 if(chart) chart.destroy();
 
 chart = new Chart(document.getElementById("chart"), {
@@ -309,4 +295,3 @@ reader.readAsText(file);
 
 </body>
 </html>
-
