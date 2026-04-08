@@ -5,11 +5,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
+
+/* ===== BODY BACKGROUND ===== */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   color: white;
   text-align: center;
+  overflow-x: hidden;
 
   background: linear-gradient(270deg,#020617,#0f172a,#020617);
   background-size: 600% 600%;
@@ -22,77 +25,131 @@ body {
   100%{background-position:0% 50%;}
 }
 
+/* ===== FLOATING PARTICLES ===== */
+body::before {
+  content:"";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle,rgba(56,189,248,0.2) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: moveParticles 20s linear infinite;
+}
+
+@keyframes moveParticles {
+  from { transform: translateY(0); }
+  to { transform: translateY(-200px); }
+}
+
+/* ===== TITLE ===== */
 h1 {
   color: #38bdf8;
-  text-shadow: 0 0 15px #38bdf8;
+  font-size: 32px;
+  text-shadow: 0 0 20px #38bdf8;
+  animation: fadeDown 1s ease;
 }
 
-/* Dashboard Panel */
+@keyframes fadeDown {
+  from {opacity:0; transform:translateY(-20px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+/* ===== DASHBOARD ===== */
 .dashboard {
-  width: 80%;
-  margin: auto;
-  margin-top: 20px;
-  padding: 15px;
-
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(56,189,248,0.3);
-}
-
-/* Main container */
-.container {
   width: 85%;
   margin: auto;
   margin-top: 20px;
   padding: 20px;
 
   background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(15px);
   border-radius: 15px;
-  box-shadow: 0 0 20px rgba(56,189,248,0.3);
+
+  box-shadow: 0 0 25px rgba(56,189,248,0.4);
+  animation: fadeUp 1s ease;
 }
 
-/* Button */
+@keyframes fadeUp {
+  from {opacity:0; transform:translateY(30px);}
+  to {opacity:1; transform:translateY(0);}
+}
+
+/* ===== MAIN CONTAINER ===== */
+.container {
+  width: 90%;
+  margin: auto;
+  margin-top: 20px;
+  padding: 25px;
+
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 15px;
+
+  box-shadow: 0 0 25px rgba(56,189,248,0.4);
+}
+
+/* ===== BUTTON ===== */
 button {
-  padding: 12px 20px;
-  background: #38bdf8;
+  padding: 14px 24px;
+  background: linear-gradient(90deg,#38bdf8,#0ea5e9);
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   margin-top: 10px;
+  color: white;
+  font-weight: bold;
   transition: 0.3s;
 }
 
 button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 20px #38bdf8;
+  transform: scale(1.08);
+  box-shadow: 0 0 25px #38bdf8;
 }
 
-/* Table */
+/* ===== TABLE ===== */
 table {
   width: 100%;
   margin-top: 20px;
   border-collapse: collapse;
+  animation: fadeUp 1s ease;
 }
 
 td, th {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid rgba(255,255,255,0.2);
 }
 
 th {
-  background: rgba(56,189,248,0.2);
+  background: rgba(56,189,248,0.25);
+  font-size: 15px;
 }
 
 tr:hover {
   background: rgba(56,189,248,0.1);
+  transition: 0.3s;
 }
 
-/* Status */
+/* ===== STATUS ===== */
 .safe { color: #22c55e; font-weight: bold; }
 .warning { color: orange; font-weight: bold; }
 .danger { color: red; font-weight: bold; }
+
+/* ===== BIG RISK DISPLAY ===== */
+.risk-display {
+  margin-top: 20px;
+  font-size: 40px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 20px currentColor;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
 </style>
 </head>
 
@@ -113,6 +170,9 @@ tr:hover {
 <br>
 <button onclick="processFile()">Predict Collapse Risk</button>
 
+<!-- BIG RISK TEXT -->
+<div id="bigRisk" class="risk-display"></div>
+
 <table id="resultsTable">
 <tr>
 <th>Distance (m)</th>
@@ -131,6 +191,7 @@ tr:hover {
 </div>
 
 <script>
+
 let chart;
 
 function processFile(){
@@ -160,6 +221,7 @@ table.innerHTML = `
 
 let distances = [];
 let risks = [];
+let maxRisk = 0;
 
 for(let i=1;i<rows.length;i++){
 
@@ -175,6 +237,8 @@ let water = Number(d[4]);
 let displacement = Number(d[5]);
 
 let risk = (vibration*5)+(pressure/20)+(gas*10)+(water*2)+(displacement*8);
+
+if(risk > maxRisk) maxRisk = risk;
 
 let status="",cls="";
 
@@ -199,7 +263,23 @@ distances.push(distance);
 risks.push(risk);
 }
 
-// Graph
+// ===== BIG RISK DISPLAY =====
+let bigText = document.getElementById("bigRisk");
+
+if(maxRisk < 40){
+  bigText.innerHTML = "SAFE ZONE";
+  bigText.style.color = "#22c55e";
+}
+else if(maxRisk < 70){
+  bigText.innerHTML = "WARNING ZONE";
+  bigText.style.color = "orange";
+}
+else{
+  bigText.innerHTML = "HIGH COLLAPSE RISK";
+  bigText.style.color = "red";
+}
+
+// ===== GRAPH =====
 if(chart) chart.destroy();
 
 chart = new Chart(document.getElementById("chart"), {
@@ -209,9 +289,14 @@ labels: distances,
 datasets: [{
 label: "Risk vs Distance",
 data: risks,
-borderWidth: 2,
-fill: false
+borderWidth: 3,
+tension: 0.4
 }]
+},
+options: {
+animation: {
+duration: 1500
+}
 }
 });
 
@@ -219,7 +304,9 @@ fill: false
 
 reader.readAsText(file);
 }
+
 </script>
 
 </body>
 </html>
+
