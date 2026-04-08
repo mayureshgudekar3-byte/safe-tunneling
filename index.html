@@ -6,36 +6,22 @@
 
 <style>
 
-/* ===== BACKGROUND (Tunnel Style) ===== */
+/* ===== BACKGROUND ===== */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   color: white;
   text-align: center;
-
-  background: radial-gradient(circle at center, #0f172a 0%, #020617 80%);
+  background: radial-gradient(circle at center, #020617, #020617 60%, #0f172a);
   overflow-x: hidden;
 }
 
-/* Moving tunnel glow lines */
-body::before {
-  content: "";
+/* Tunnel moving particles */
+canvas#bgCanvas {
   position: fixed;
-  width: 200%;
-  height: 200%;
-  background: repeating-linear-gradient(
-    90deg,
-    rgba(56,189,248,0.05) 0px,
-    rgba(56,189,248,0.05) 2px,
-    transparent 2px,
-    transparent 80px
-  );
-  animation: moveTunnel 8s linear infinite;
-}
-
-@keyframes moveTunnel {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-200px); }
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 
 /* ===== TITLE ===== */
@@ -46,55 +32,50 @@ h1 {
   animation: fadeIn 2s ease;
 }
 
-/* ===== DASHBOARD ===== */
+/* ===== DASHBOARD CARDS ===== */
 .dashboard {
-  width: 80%;
-  margin: auto;
-  margin-top: 20px;
-  padding: 20px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 20px;
+}
 
+.card {
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(15px);
+  padding: 20px;
+  margin: 10px;
   border-radius: 15px;
-  box-shadow: 0 0 25px rgba(56,189,248,0.3);
+  width: 200px;
+  box-shadow: 0 0 20px rgba(56,189,248,0.3);
+  transition: 0.3s;
 }
 
-/* BIG RISK TEXT */
-.risk-text {
-  font-size: 22px;
-  font-weight: bold;
-  margin-top: 10px;
+.card:hover {
+  transform: scale(1.05);
 }
 
-.safeText {
-  color: #22c55e;
-  text-shadow: 0 0 10px #22c55e;
+.card h3 {
+  margin: 10px 0;
 }
 
-.warningText {
-  color: #facc15;
-  text-shadow: 0 0 10px #facc15;
-}
+/* COLORS */
+.safe { color: #22c55e; }
+.warning { color: #facc15; }
+.danger { color: #ef4444; }
 
-.dangerText {
-  color: #ef4444;
-  text-shadow: 0 0 10px #ef4444;
-}
-
-/* ===== MAIN CONTAINER ===== */
+/* ===== MAIN BOX ===== */
 .container {
   width: 85%;
   margin: auto;
-  margin-top: 20px;
   padding: 20px;
-
   background: rgba(255,255,255,0.05);
   backdrop-filter: blur(15px);
   border-radius: 15px;
   box-shadow: 0 0 25px rgba(56,189,248,0.3);
 }
 
-/* ===== BUTTON ===== */
+/* BUTTON */
 button {
   padding: 14px 25px;
   background: linear-gradient(45deg,#38bdf8,#0ea5e9);
@@ -112,12 +93,11 @@ button:hover {
   box-shadow: 0 0 25px #38bdf8;
 }
 
-/* ===== TABLE ===== */
+/* TABLE */
 table {
   width: 100%;
   margin-top: 20px;
   border-collapse: collapse;
-  animation: fadeIn 1.5s ease;
 }
 
 td, th {
@@ -129,25 +109,26 @@ th {
   background: rgba(56,189,248,0.2);
 }
 
-tr:hover {
-  background: rgba(56,189,248,0.1);
-  transform: scale(1.01);
+/* RISK METER */
+.meter {
+  width: 200px;
+  height: 20px;
+  background: #111;
+  border-radius: 20px;
+  margin: 10px auto;
+  overflow: hidden;
 }
 
-/* ===== STATUS COLORS ===== */
-.safe { color: #22c55e; font-weight: bold; }
-.warning { color: #facc15; font-weight: bold; }
-.danger { color: #ef4444; font-weight: bold; }
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  transition: 1s;
+}
 
-/* ===== ANIMATIONS ===== */
+/* ANIMATION */
 @keyframes fadeIn {
-  from {opacity: 0; transform: translateY(20px);}
-  to {opacity: 1; transform: translateY(0);}
-}
-
-canvas {
-  margin-top: 30px;
-  animation: fadeIn 2s ease;
+  from {opacity:0; transform:translateY(20px);}
+  to {opacity:1; transform:translateY(0);}
 }
 
 </style>
@@ -155,17 +136,33 @@ canvas {
 
 <body>
 
+<canvas id="bgCanvas"></canvas>
+
 <h1>AI Driven Smart Tunneling and Underground Safety System</h1>
 
 <!-- DASHBOARD -->
 <div class="dashboard">
-  <h2>📊 Risk Levels</h2>
 
-  <div class="risk-text safeText">SAFE: Risk &lt; 40</div>
-  <div class="risk-text warningText">WARNING: 40 – 70</div>
-  <div class="risk-text dangerText">HIGH RISK: &gt; 70</div>
+<div class="card">
+<h3>SAFE</h3>
+<p class="safe">Risk &lt; 40</p>
+</div>
 
-  <p style="margin-top:15px;">📍 Sensor Coverage: 0m → 500m Tunnel Length</p>
+<div class="card">
+<h3>WARNING</h3>
+<p class="warning">40 – 70</p>
+</div>
+
+<div class="card">
+<h3>HIGH RISK</h3>
+<p class="danger">&gt; 70</p>
+</div>
+
+<div class="card">
+<h3>Coverage</h3>
+<p>0m → 500m</p>
+</div>
+
 </div>
 
 <!-- MAIN -->
@@ -174,6 +171,12 @@ canvas {
 <input type="file" id="fileInput">
 <br>
 <button onclick="processFile()">Predict Collapse Risk</button>
+
+<!-- RISK METER -->
+<h3>Overall Risk Level</h3>
+<div class="meter">
+  <div class="meter-fill" id="meterFill"></div>
+</div>
 
 <table id="resultsTable">
 <tr>
@@ -193,6 +196,43 @@ canvas {
 </div>
 
 <script>
+
+/* ===== BACKGROUND PARTICLES ===== */
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+
+for(let i=0;i<80;i++){
+  particles.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    speed: Math.random()*2+1
+  });
+}
+
+function animateBG(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#38bdf8";
+
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,2,0,Math.PI*2);
+    ctx.fill();
+
+    p.y += p.speed;
+    if(p.y > canvas.height) p.y = 0;
+  });
+
+  requestAnimationFrame(animateBG);
+}
+
+animateBG();
+
+/* ===== MAIN FUNCTION ===== */
 let chart;
 
 function processFile(){
@@ -207,21 +247,12 @@ reader.onload = function(e){
 const rows = e.target.result.split('\n');
 const table = document.getElementById("resultsTable");
 
-table.innerHTML = `
-<tr>
-<th>Distance (m)</th>
-<th>Vibration (mm/s)</th>
-<th>Pressure (kPa)</th>
-<th>Gas (ppm)</th>
-<th>Water (m)</th>
-<th>Displacement (mm)</th>
-<th>Risk Score</th>
-<th>Status</th>
-</tr>
-`;
+table.innerHTML = table.rows[0].outerHTML;
 
 let distances = [];
 let risks = [];
+let totalRisk = 0;
+let count = 0;
 
 for(let i=1;i<rows.length;i++){
 
@@ -259,9 +290,28 @@ row.innerHTML = `
 
 distances.push(distance);
 risks.push(risk);
+
+totalRisk += risk;
+count++;
 }
 
-// GRAPH
+/* ===== RISK METER ===== */
+let avgRisk = totalRisk / count;
+let meter = document.getElementById("meterFill");
+
+meter.style.width = Math.min(avgRisk,100) + "%";
+
+if(avgRisk < 40){
+  meter.style.background = "#22c55e";
+}
+else if(avgRisk < 70){
+  meter.style.background = "#facc15";
+}
+else{
+  meter.style.background = "#ef4444";
+}
+
+/* ===== GRAPH ===== */
 if(chart) chart.destroy();
 
 chart = new Chart(document.getElementById("chart"), {
@@ -281,6 +331,7 @@ tension: 0.4
 
 reader.readAsText(file);
 }
+
 </script>
 
 </body>
