@@ -2,26 +2,41 @@
 <html>
 <head>
 <title>AI Tunnel Safety System</title>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
-/* ===== BACKGROUND ===== */
+/* ===== VIDEO BACKGROUND ===== */
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* DARK OVERLAY */
+body::before {
+  content: "";
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.65);
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+/* ===== BODY ===== */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   color: white;
   text-align: center;
-  background: radial-gradient(circle at center, #020617, #020617 60%, #0f172a);
   overflow-x: hidden;
-}
-
-/* Tunnel moving particles */
-canvas#bgCanvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
 }
 
 /* ===== TITLE ===== */
@@ -29,10 +44,9 @@ h1 {
   color: #38bdf8;
   font-size: 32px;
   text-shadow: 0 0 20px #38bdf8;
-  animation: fadeIn 2s ease;
 }
 
-/* ===== DASHBOARD CARDS ===== */
+/* ===== DASHBOARD ===== */
 .dashboard {
   display: flex;
   justify-content: space-around;
@@ -55,16 +69,12 @@ h1 {
   transform: scale(1.05);
 }
 
-.card h3 {
-  margin: 10px 0;
-}
-
 /* COLORS */
 .safe { color: #22c55e; }
 .warning { color: #facc15; }
 .danger { color: #ef4444; }
 
-/* ===== MAIN BOX ===== */
+/* ===== MAIN CONTAINER ===== */
 .container {
   width: 85%;
   margin: auto;
@@ -125,18 +135,15 @@ th {
   transition: 1s;
 }
 
-/* ANIMATION */
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(20px);}
-  to {opacity:1; transform:translateY(0);}
-}
-
 </style>
 </head>
 
 <body>
 
-<canvas id="bgCanvas"></canvas>
+<!-- 🎥 VIDEO BACKGROUND -->
+<video autoplay muted loop id="bgVideo">
+  <source src="tunnel.mp4" type="video/mp4">
+</video>
 
 <h1>AI Driven Smart Tunneling and Underground Safety System</h1>
 
@@ -172,7 +179,6 @@ th {
 <br>
 <button onclick="processFile()">Predict Collapse Risk</button>
 
-<!-- RISK METER -->
 <h3>Overall Risk Level</h3>
 <div class="meter">
   <div class="meter-fill" id="meterFill"></div>
@@ -197,42 +203,6 @@ th {
 
 <script>
 
-/* ===== BACKGROUND PARTICLES ===== */
-const canvas = document.getElementById("bgCanvas");
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-
-for(let i=0;i<80;i++){
-  particles.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    speed: Math.random()*2+1
-  });
-}
-
-function animateBG(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="#38bdf8";
-
-  particles.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,2,0,Math.PI*2);
-    ctx.fill();
-
-    p.y += p.speed;
-    if(p.y > canvas.height) p.y = 0;
-  });
-
-  requestAnimationFrame(animateBG);
-}
-
-animateBG();
-
-/* ===== MAIN FUNCTION ===== */
 let chart;
 
 function processFile(){
